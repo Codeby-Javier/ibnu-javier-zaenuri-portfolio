@@ -280,10 +280,10 @@ a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent
   inset: 0;
   z-index: 0;
   border-radius: inherit;
-  background: linear-gradient(180deg, rgba(40, 27, 22, 0.58), rgba(14, 9, 7, 0.66));
+  background: linear-gradient(180deg, rgba(40, 27, 22, 0.72), rgba(14, 9, 7, 0.8));
   border: 1px solid rgba(255, 255, 255, 0.07);
-  -webkit-backdrop-filter: blur(18px) saturate(130%);
-          backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+          backdrop-filter: blur(8px) saturate(120%);
   box-shadow:
     0 18px 48px -20px rgba(0, 0, 0, 0.6),
     0 16px 44px -18px rgba(255, 92, 31, 0.16);
@@ -388,6 +388,7 @@ a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent
   gap: 9px;
   height: 44px;
   padding: 0 20px;
+  white-space: nowrap;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.32);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
@@ -414,9 +415,10 @@ a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent
 .cta:hover .cta-arrow { transform: translate(1.5px, -1.5px); }
 .cta:active { transform: translateY(0); }
 
-.theme-btn {
+.social-link {
   display: grid;
   place-items: center;
+  flex: 0 0 auto;
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -430,25 +432,16 @@ a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent
     transform 0.2s var(--ease-soft);
 }
 
-.theme-btn svg { width: 19px; height: 19px; transition: transform 0.5s var(--ease-cine); }
+.social-link svg { width: 18px; height: 18px; }
 
-.theme-btn:hover {
+.social-link:hover {
   border-color: rgba(255, 150, 90, 0.5);
   color: #fff;
   box-shadow: 0 0 22px -4px rgba(255, 92, 31, 0.4);
+  transform: translateY(-1px);
 }
 
-.theme-btn:hover svg { transform: rotate(25deg); }
-.theme-btn:active { transform: scale(0.95); }
-
-.theme-btn.is-pulse { animation: theme-pulse 0.6s var(--ease-soft); }
-
-@keyframes theme-pulse {
-  40% {
-    box-shadow: 0 0 28px -2px rgba(255, 92, 31, 0.55);
-    border-color: rgba(255, 150, 90, 0.8);
-  }
-}
+.social-link:active { transform: scale(0.95); }
 
 /* ---------- 06 · Hero typography (L07) ---------- */
 .hero-copy {
@@ -522,10 +515,10 @@ a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent
   gap: 12px;
   padding: 13px 16px 14px 13px;
   border-radius: 24px;
-  background: linear-gradient(180deg, rgba(126, 116, 110, 0.38), rgba(72, 63, 58, 0.32));
+  background: linear-gradient(180deg, rgba(112, 102, 96, 0.62), rgba(64, 56, 51, 0.56));
   border: 1px solid rgba(255, 255, 255, 0.14);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
-          backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+          backdrop-filter: blur(8px) saturate(120%);
   box-shadow:
     0 30px 70px -24px rgba(0, 0, 0, 0.65),
     inset 0 1px 0 rgba(255, 255, 255, 0.09);
@@ -537,9 +530,9 @@ a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background-image: url("assets/hero-portrait.jpg");
-  background-size: 380%;
-  background-position: 51% 36%;
+  background-image: url("assets/javier-avatar.webp");
+  background-size: cover;
+  background-position: 50% 32%;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
 }
 
@@ -592,10 +585,10 @@ a, button { touch-action: manipulation; -webkit-tap-highlight-color: transparent
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: rgba(96, 88, 84, 0.55);
+  background: rgba(96, 88, 84, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  -webkit-backdrop-filter: blur(12px);
-          backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(5px);
+          backdrop-filter: blur(5px);
   color: rgba(255, 255, 255, 0.85);
   opacity: 0.9;
   box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.5);
@@ -766,7 +759,7 @@ button:focus-visible {
 }
 
 .cta:focus-visible,
-.theme-btn:focus-visible,
+.social-link:focus-visible,
 .notif-close:focus-visible { border-radius: 999px; }
 
 /* no-JS: the composed, static hero */
@@ -795,7 +788,7 @@ button:focus-visible {
   .notification { transform: translateX(-50%) !important; }
   .portrait-veil, .portrait-sweep, .eye-flash, .eye-flash::before { animation: none !important; opacity: 0 !important; }
   .cursor-light { display: none; }
-  .cta:hover, .theme-btn:active, .notif-close:hover { transform: none; }
+  .cta:hover, .social-link:active, .notif-close:hover { transform: none; }
 
   .hero { animation: fade-in 1s ease both; }
 }
@@ -812,8 +805,8 @@ button:focus-visible {
   .header-pill { height: 58px; padding: 0 8px 0 20px; }
   .brand-mark { width: 36px; height: 20px; }
   .cta { height: 40px; padding: 0 16px; font-size: 13.5px; }
-  .theme-btn { width: 40px; height: 40px; }
-  .theme-btn svg { width: 17px; height: 17px; }
+  .social-link { width: 40px; height: 40px; }
+  .social-link svg { width: 17px; height: 17px; }
 }
 
 @media (max-width: 720px), (max-width: 940px) and (orientation: portrait) {
@@ -850,7 +843,6 @@ button:focus-visible {
 
 /* portrait-orientation tablets: larger stage, same stacked copy */
 @media (min-width: 721px) and (max-width: 940px) and (orientation: portrait) {
-  .portrait-frame { top: 0; height: 64vh; height: 64svh; }
   .hero-copy { bottom: 18vh; bottom: 18svh; }
 }
 
@@ -864,7 +856,6 @@ button:focus-visible {
 
 /* short landscape phones */
 @media (max-height: 520px) and (orientation: landscape) {
-  .portrait-frame { top: -16vh; height: 130vh; }
   .hero-copy { top: 54%; }
   .site-header { top: 10px; }
   .header-pill { height: 52px; }
@@ -1754,9 +1745,9 @@ button:focus-visible {
             mask-image: none;
   }
 
-  .ab-box-title { left: 14px; bottom: 34px; font-size: clamp(17px, 2.9svh, 26px); }
-  .ab-line { left: 14px; bottom: 26px; width: 26px; }
-  .ab-sub { left: 14px; bottom: 9px; right: 46%; font-size: 8.5px; }
+  .ab-box-title { left: 14px; bottom: 42px; font-size: clamp(17px, 2.9svh, 26px); }
+  .ab-line { left: 14px; bottom: 34px; width: 26px; }
+  .ab-sub { left: 14px; bottom: 10px; right: 38%; font-size: 8px; line-height: 1.45; }
   .ab-arrow { right: 10px; bottom: 10px; }
   .ab-arrow svg { width: 16px; height: 11px; }
 
@@ -2022,16 +2013,14 @@ html.works-open .wk { display: block; }
   --wa: #e8281e;
   position: relative;
   width: min(76vw, 1220px);
-  height: min(64svh, 640px);
+  height: min(58svh, 580px);
   padding: clamp(20px, 4.4svh, 46px);
   display: grid;
-  grid-template-columns: 0.92fr 1.08fr;
+  grid-template-columns: 0.86fr 1.14fr;
   gap: clamp(18px, 3vw, 48px);
   border-radius: 22px;
   overflow: hidden;
   background: linear-gradient(155deg, rgba(40, 23, 20, 0.97) 0%, rgba(13, 6, 5, 0.95) 58%, rgba(8, 3, 3, 0.97) 100%);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
-          backdrop-filter: blur(16px) saturate(120%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
     0 50px 120px -40px rgba(0, 0, 0, 0.82),
@@ -2135,19 +2124,24 @@ html.works-open .wk { display: block; }
 
 .wk-media {
   position: relative;
+  align-self: center;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  padding: 6px;
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(6, 3, 2, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 26px 60px -22px rgba(0, 0, 0, 0.7);
   transform: translate3d(0, calc(var(--o, 0) * -3svh), 0);
 }
 
 .wk-media img {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 /* --- intro / outro stages -------------------------------------- */
@@ -2243,7 +2237,7 @@ html.works-open .wk { display: block; }
 .wk-detail {
   position: absolute;
   inset: 0;
-  z-index: 50;
+  z-index: 400; /* the project stages reach z-index 100 - detail must top them */
   visibility: hidden;
   opacity: 0;
   display: grid;
@@ -2567,9 +2561,9 @@ html.works-open .wk { display: block; }
   margin: 0;
   padding: clamp(20px, 3svh, 34px);
   border-radius: 20px;
-  background: linear-gradient(158deg, rgba(52, 30, 26, 0.72), rgba(14, 7, 6, 0.62));
-  -webkit-backdrop-filter: blur(16px) saturate(125%);
-          backdrop-filter: blur(16px) saturate(125%);
+  background: linear-gradient(158deg, rgba(52, 30, 26, 0.82), rgba(14, 7, 6, 0.72));
+  -webkit-backdrop-filter: blur(6px) saturate(115%);
+          backdrop-filter: blur(6px) saturate(115%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
     0 40px 110px -40px rgba(0, 0, 0, 0.85),
@@ -3393,4 +3387,718 @@ html.works-open .wk { display: block; }
   .ft { --ftP: 1; padding-top: 14svh; }
   .ft-line { transform: none !important; }
   .ft-col { transform: none !important; }
+}
+
+/* ============================================================
+   JAVIER · portrait / hero / about overrides
+   ============================================================ */
+
+/* the cutout is a portrait, not a landscape crop; the top offset keeps the
+   hair clear of the header pill at every desktop height */
+.portrait-frame {
+  top: clamp(48px, 7vh, 72px);
+  height: 100vh;
+  aspect-ratio: 614 / 1175;
+  -webkit-mask-image: linear-gradient(to bottom, #000 84%, rgba(0, 0, 0, 0) 99%);
+          mask-image: linear-gradient(to bottom, #000 84%, rgba(0, 0, 0, 0) 99%);
+}
+
+.portrait-img { object-fit: contain; }
+
+/* eye-flash windows, measured on javier-hero.webp */
+:root {
+  --eye-x: 40.7%;
+  --eye-y: 17.2%;
+  --eye2-x: 53.4%;
+  --eye2-y: 17.8%;
+}
+
+.eye-flash {
+  width: 8.6%;
+  aspect-ratio: 2.75 / 1;
+  transform: translate(-50%, -50%) rotate(-6deg);
+}
+
+.eye-flash--right {
+  width: 8%;
+  aspect-ratio: 2.4 / 1;
+  transform: translate(-50%, -50%) rotate(-8deg);
+}
+
+/* five specialisations sit in a tidy right-aligned grid */
+.hero-meta {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  justify-content: end;
+  column-gap: 18px;
+  row-gap: 5px;
+  margin: 12px 0 0 auto;
+}
+
+.hero-meta li { display: block; justify-self: end; }
+.hero-meta li + li::before { content: none; }
+.hero-meta li:last-child { grid-column: 1 / -1; }
+
+/* --- About doors: the transparent portraits fill the card --------- */
+.ab-box--who .ab-img,
+.ab-box--think .ab-img {
+  top: 0;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 12%;
+  filter: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 76%, transparent 99%);
+          mask-image: linear-gradient(to bottom, #000 76%, transparent 99%);
+}
+
+.ab-sub { white-space: normal; line-height: 1.5; }
+
+.ab-box--think .ab-img {
+  object-position: 50% 8%;
+  opacity: 0.92;
+}
+
+/* the project screenshot is not a cut-out, so no multiply blend */
+.ab-img--air {
+  right: -4%;
+  bottom: 34%;
+  width: 88%;
+  mix-blend-mode: normal;
+  filter: none;
+  opacity: 0.96;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 24px 50px -24px rgba(0, 0, 0, 0.8);
+}
+
+/* --- expanded About views: keep the cut-outs, drop the duotone ---- */
+.ab-view[data-ab="who"] .ab-view-media img,
+.ab-view[data-ab="think"] .ab-view-media img {
+  object-fit: contain;
+  filter: none;
+}
+
+.ab-view[data-ab="think"] .ab-view-media img { opacity: 0.92; }
+
+@media (max-width: 720px), (max-width: 940px) and (orientation: portrait) {
+  .portrait-frame {
+    top: clamp(72px, 9svh, 90px);
+    height: 58svh;
+    -webkit-mask-image: linear-gradient(to bottom, #000 88%, rgba(0, 0, 0, 0) 100%);
+            mask-image: linear-gradient(to bottom, #000 88%, rgba(0, 0, 0, 0) 100%);
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 5px 12px;
+    margin: 10px 0 0;
+    font-size: 11px;
+  }
+
+  .hero-meta li { gap: 8px; }
+
+  /* the portrait owns the right edge; labels stay in the calm left zone */
+  .ab-kicker { left: 46px; right: auto; }
+
+  .ab-img--air {
+    right: 8px;
+    top: 30px;
+    bottom: auto;
+    width: 54%;
+  }
+
+  .ab-box--what .ab-sub { right: 14px; }
+}
+
+/* portrait tablets keep a slightly larger stage than phones */
+@media (min-width: 721px) and (max-width: 940px) and (orientation: portrait) {
+  .portrait-frame { top: 7svh; height: 60svh; }
+}
+
+/* ============================================================
+   EXPERIENCE · pinned company deck (script.js → 07b)
+   ============================================================ */
+
+.xp {
+  position: relative;
+  height: 640vh;
+  background: var(--black);
+  color: var(--text-hi);
+  isolation: isolate;
+}
+
+.xp-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.xp-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.86fr) minmax(0, 1.3fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 72px);
+  width: min(1440px, 100%);
+  height: 100%;
+  margin: 0 auto;
+  padding: clamp(84px, 11svh, 130px) var(--gutter) clamp(46px, 7svh, 84px);
+}
+
+.xp-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0 var(--gutter);
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px) 0 0 / 25% 100%,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px) 0 0 / 100% 25%;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
+  opacity: 0.6;
+}
+
+.xp-glow {
+  position: absolute;
+  left: 16%;
+  top: 46%;
+  width: min(940px, 88vw);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(179, 68, 26, 0.16), transparent 62%);
+  filter: blur(18px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* --- header column ------------------------------------------------ */
+.xp-head {
+  position: relative;
+  z-index: 2;
+  max-width: 540px;
+}
+
+.xp-eyebrow {
+  margin: 0 0 clamp(18px, 3svh, 30px);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+}
+
+.xp-title {
+  margin: 0;
+  font-family: "Anton", "Archivo", sans-serif;
+  font-weight: 400;
+  font-size: clamp(40px, 4.9vw, 76px);
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+.xp-title span { display: block; }
+
+.xp-title span + span {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(245, 239, 233, 0.62);
+}
+
+.xp-note {
+  max-width: 36ch;
+  margin: clamp(18px, 2.8svh, 28px) 0 0;
+  font-size: clamp(13px, 0.95vw, 15px);
+  line-height: 1.6;
+  color: var(--text-mid);
+}
+
+/* --- company rail ------------------------------------------------- */
+.xp-rail {
+  display: flex;
+  flex-direction: column;
+  margin-top: clamp(26px, 4.4svh, 44px);
+  max-width: 340px;
+}
+
+.xp-dot {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  opacity: 0.32;
+  transition: opacity 0.45s var(--ease-soft), transform 0.45s var(--ease-cine);
+}
+
+.xp-dot:last-child { border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+
+.xp-dot i {
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--text-low);
+}
+
+.xp-dot b {
+  overflow: hidden;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.xp-dot.is-on { opacity: 1; transform: translateX(4px); }
+.xp-dot.is-on i { color: var(--accent); }
+.xp-dot.is-on b { color: #fff; }
+
+/* --- deck --------------------------------------------------------- */
+.xp-deck {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: min(66svh, 640px);
+}
+
+.xp-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(100%, 720px);
+  padding: clamp(22px, 2.6vw, 40px);
+  color: var(--text-hi);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  background:
+    linear-gradient(152deg, rgba(38, 21, 15, 0.94), rgba(11, 8, 7, 0.98));
+  box-shadow:
+    0 50px 110px -50px rgba(0, 0, 0, 0.95),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+  pointer-events: none;
+  transition:
+    transform 0.62s var(--ease-cine),
+    opacity 0.3s var(--ease-soft),
+    border-color 0.5s var(--ease-soft);
+}
+
+.xp-card.is-active {
+  pointer-events: auto;
+  border-color: rgba(255, 90, 31, 0.36);
+}
+
+.xp-top {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(14px, 1.6vw, 22px);
+}
+
+.xp-logo {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: clamp(48px, 5.6svh, 64px);
+  aspect-ratio: 1;
+  padding: 9px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #f4f1ed;
+}
+
+.xp-logo img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.xp-mono {
+  font-family: "Anton", "Archivo", sans-serif;
+  font-size: clamp(16px, 1.9svh, 22px);
+  letter-spacing: 0.02em;
+  color: #1a1311;
+}
+
+.xp-id { min-width: 0; }
+
+.xp-period {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+}
+
+.xp-company {
+  margin: 0.3em 0 0.16em;
+  font-family: "Anton", "Archivo", sans-serif;
+  font-weight: 400;
+  font-size: clamp(24px, 2.8vw, 42px);
+  line-height: 0.98;
+  text-transform: uppercase;
+  overflow-wrap: break-word;
+}
+
+.xp-role {
+  margin: 0;
+  font-size: clamp(12px, 1vw, 15px);
+  color: var(--text-mid);
+}
+
+.xp-summary {
+  max-width: 64ch;
+  margin: clamp(16px, 2.4svh, 26px) 0 0;
+  font-size: clamp(13px, 1vw, 15.5px);
+  line-height: 1.62;
+  color: var(--text-mid);
+}
+
+.xp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: clamp(14px, 2svh, 22px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.xp-tags li {
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 99px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+}
+
+.xp-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: clamp(16px, 2.4svh, 26px);
+  padding-top: clamp(13px, 1.8svh, 18px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.xp-metric {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--text-low);
+}
+
+.xp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+  text-decoration: none;
+  transition: color 0.35s var(--ease-soft), gap 0.35s var(--ease-cine);
+}
+
+.xp-link svg { width: 15px; height: 10px; }
+.xp-link:hover { color: #fff; gap: 12px; }
+
+/* --- footer row --------------------------------------------------- */
+.xp-foot {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: clamp(16px, 2.6svh, 30px);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--text-low);
+  pointer-events: none;
+}
+
+.xp-count b { font-weight: 600; color: #fff; }
+
+.xp-hint i {
+  display: inline-block;
+  margin-left: 6px;
+  font-style: normal;
+  animation: xp-nudge 1.9s var(--ease-inout) infinite;
+}
+
+@keyframes xp-nudge {
+  50% { transform: translateY(4px); }
+}
+
+/* --- stacked timeline (small screens / reduced motion) ------------ */
+.xp.is-stacked {
+  height: auto;
+  padding-bottom: 10svh;
+}
+
+.xp.is-stacked .xp-pin {
+  position: static;
+  height: auto;
+  overflow: visible;
+}
+
+.xp.is-stacked .xp-stage {
+  display: block;
+  height: auto;
+  padding: 16svh var(--gutter) 0;
+}
+
+.xp.is-stacked .xp-stage::before,
+.xp.is-stacked .xp-glow { display: none; }
+
+.xp.is-stacked .xp-head { max-width: 680px; }
+
+.xp.is-stacked .xp-rail { display: none; }
+
+.xp.is-stacked .xp-deck {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  height: auto;
+  margin-top: clamp(34px, 6svh, 60px);
+}
+
+.xp.is-stacked .xp-card {
+  position: relative;
+  left: auto;
+  top: auto;
+  width: 100%;
+  transform: none;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.xp.is-stacked .xp-foot { display: none; }
+
+@media (max-width: 1100px) {
+  .xp-stage { grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr); }
+  .xp-title { font-size: clamp(36px, 4.4vw, 58px); }
+  .xp-card { padding: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp { height: auto; }
+  .xp-pin { position: static; height: auto; overflow: visible; }
+  .xp-stage { display: block; height: auto; padding: 16svh var(--gutter) 8svh; }
+  .xp-deck {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    height: auto;
+    margin-top: 40px;
+  }
+  .xp-card {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+    transform: none !important;
+    opacity: 1 !important;
+    pointer-events: auto;
+  }
+  .xp-rail, .xp-foot { display: none; }
+  .xp-hint i { animation: none; }
+}
+
+/* ============================================================
+   MOBILE NAVIGATION · the primary links become a dropdown
+   ============================================================ */
+
+.nav-toggle { display: none; }
+
+@media (max-width: 900px) {
+  .nav-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 50%;
+    background: radial-gradient(120% 120% at 30% 20%, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+    color: rgba(245, 239, 233, 0.85);
+    transition: border-color 0.35s var(--ease-soft), color 0.35s var(--ease-soft), transform 0.35s var(--ease-soft);
+  }
+
+  .nav-toggle:hover { border-color: rgba(255, 150, 90, 0.5); color: #fff; }
+  .nav-toggle:active { transform: scale(0.95); }
+
+  .nav-toggle-bar {
+    display: block;
+    width: 17px;
+    height: 1.5px;
+    border-radius: 2px;
+    background: currentColor;
+    transition: transform 0.35s var(--ease-cine), opacity 0.25s var(--ease-soft);
+  }
+
+  .nav-toggle-bar + .nav-toggle-bar { margin-top: 0; }
+
+  .site-header.is-nav-open .nav-toggle-bar:first-child {
+    transform: translateY(3.75px) rotate(45deg);
+  }
+
+  .site-header.is-nav-open .nav-toggle-bar:last-child {
+    transform: translateY(-3.75px) rotate(-45deg);
+  }
+
+  .site-header.is-nav-open .site-nav {
+    display: block;
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: min(280px, calc(100vw - 32px));
+    padding: 8px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    background: linear-gradient(165deg, rgba(36, 23, 19, 0.97), rgba(12, 7, 6, 0.98));
+    box-shadow:
+      0 28px 60px -20px rgba(0, 0, 0, 0.9),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    z-index: 5;
+  }
+
+  .site-header.is-nav-open .site-nav ul {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .site-header.is-nav-open .site-nav li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .site-header.is-nav-open .site-nav li:last-child { border-bottom: 0; }
+
+  .site-header.is-nav-open .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 14px 2px;
+    font-size: 15px;
+    color: var(--text-hi);
+  }
+
+  .site-header.is-nav-open .nav-link::after { display: none; }
+  .site-header.is-nav-open .nav-dot { margin-right: 8px; }
+}
+
+/* ============================================================
+   JAVIER · live result chip / dark logo tile / media zoom
+   ============================================================ */
+
+/* Wealthy People: white + gold mark needs a dark tile */
+.xp-logo--dark {
+  background: #070605;
+  border: 1px solid rgba(214, 178, 94, 0.26);
+}
+
+/* live-market marker on a project card */
+.wk-meta.is-live { color: rgba(240, 233, 230, 0.78); }
+
+.wk-live {
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #39e08b;
+}
+
+.wk-meta.is-live i { animation: wk-live-pulse 2.4s ease-out infinite; }
+
+@keyframes wk-live-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(57, 224, 139, 0.55), 0 0 10px #39e08b; }
+  65%  { box-shadow: 0 0 0 7px rgba(57, 224, 139, 0),  0 0 10px #39e08b; }
+  100% { box-shadow: 0 0 0 0 rgba(57, 224, 139, 0),    0 0 10px #39e08b; }
+}
+
+/* enlarge affordance on every project screenshot */
+.wk-zoom {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
+  background: rgba(8, 4, 3, 0.72);
+  color: rgba(245, 241, 238, 0.82);
+  cursor: pointer;
+  pointer-events: auto; /* .wk-space disables hits for the 3D stages */
+  opacity: 0.55;
+  transform: none;
+  transition:
+    opacity 0.4s var(--ease-cine),
+    transform 0.4s var(--ease-cine),
+    background 0.3s var(--ease-soft),
+    border-color 0.3s var(--ease-soft),
+    color 0.3s var(--ease-soft);
+}
+
+.wk-zoom svg { width: 13px; height: 13px; }
+
+.wk-glass:hover .wk-zoom,
+.wk-glass:focus-within .wk-zoom,
+.wk-zoom:focus-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.wk-zoom:hover {
+  background: var(--wa);
+  border-color: transparent;
+  color: #0a0504;
+}
+
+/* touch screens have no hover - keep the affordance visible */
+@media (hover: none) {
+  .wk-zoom { opacity: 0.92; transform: none; }
+}
+
+@media (max-width: 720px) {
+  .xp-logo--dark { border-radius: 3px; }
+  .wk-zoom { right: 9px; bottom: 9px; width: 30px; height: 30px; }
+  .wk-zoom svg { width: 11px; height: 11px; }
+  .wk-live { letter-spacing: 0.14em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-meta.is-live i { animation: none; }
+  .wk-zoom { opacity: 1; transform: none; transition: none; }
+}
+
+/* very narrow phones: keep brand, CTA, both socials and the menu on one row */
+@media (max-width: 360px) {
+  .header-pill { gap: 10px; padding-left: 14px; }
+  .brand { padding-right: 0; }
+  .brand-mark { width: 30px; }
+  .header-actions { gap: 6px; }
+  .social-link { width: 34px; height: 34px; }
+  .social-link svg { width: 16px; height: 16px; }
+  .cta { padding: 0 9px; font-size: 12px; gap: 5px; }
+  .cta-arrow { width: 11px; height: 11px; }
+  .nav-toggle { width: 38px; height: 38px; }
 }

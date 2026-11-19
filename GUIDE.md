@@ -3,6 +3,14 @@
 Everything about this site, in the order you experience it. Start at [Run it](#1-run-it),
 then follow the flow from the hero to the footer.
 
+> **Javier build note.** This edition adds a pinned **04 · Experience** chapter between
+> About Me and Selected Works. It now holds **seven companies** — from the newest Web3
+> role at Wealthy People back through backend, frontend and product work — and the works
+> deck carries **15 projects**, including the live Bulwark Score result. The Experience
+> deck lives in `script.js` (module `07b`) with its styles at the end of `styles.css`;
+> its content is `heroContent.experience` in `content.js`. The rest of this guide
+> describes the shared animation system and still applies.
+
 ---
 
 ## Contents
@@ -56,7 +64,8 @@ index.html      structure of every chapter
 styles.css      all presentation, in numbered sections
 script.js       all behaviour, in numbered modules
 content.js      ALL text and project data — edit here first
-assets/         images and the 3D scene the site loads
+assets/         images and the 3D scenes the site loads
+vendor/spline/  the self-hosted Spline runtime (pixel ratio capped, watermark removed)
 references/     the design references this build follows (not shipped)
 ```
 
@@ -68,6 +77,7 @@ Four rules hold the whole thing together:
 | Scroll drives sections, the mouse drives robots | The two never fight each other |
 | Animation uses `transform` and `opacity` only | Anything else re-rasterises and drops frames |
 | Off-screen work stops | Each 3D scene pauses and each loop parks when idle |
+| Heavy media waits for approach | The first view downloads only the hero, CSS and JS |
 
 `styles.css` and `script.js` are both numbered, and the numbers line up with the chapters
 below, so a section in one file has an obvious counterpart in the other.
@@ -106,7 +116,9 @@ portrait and lighting drift with the cursor.
 ### 3.2 Creative section
 
 Pinned and scrubbed to scroll. The three lines rise through their own masks, then the
-coloured labels pop outward from the centre. Scroll back and it reverses exactly.
+coloured labels pop outward from the centre. Scroll back and it reverses exactly. The
+timeline starts one screen early — the composition is already forming while the white
+stage slides up, so the approach never reads as an empty (or loading) screen.
 
 *Reference:* `references/02-creative.jpg`
 
@@ -121,8 +133,12 @@ them.
 ### 3.4 About Me
 
 Three doors: **Who I Am**, **What I Do**, **How I Think**. Who and How open into a themed
-detail layer that grows out of the box you clicked. **What I Do is different** — it is the
+detail layer that grows out of the box you clicked. **What I Do is different** - it is the
 entrance to Selected Works.
+
+The doors' portraits (including the real QArena screenshot in **What I Do**) download one
+screen before the cards arrive, and the two full-size detail portraits on first click, so
+the opening view never pays for them.
 
 *Reference:* `references/03-about.jpg`
 
@@ -137,9 +153,15 @@ outro button, or `Esc` flashes you back to About.
 
 ### 3.6 Big robot
 
-The large robot on black, at its own scale and lighting. **Its head follows your mouse** —
-left, centre, right — with damping. Scroll, meanwhile, flies two glass idea panels out of
+The large robot on black, at its own scale and lighting. **Its head follows your mouse** -
+left, centre, right - with damping. Scroll, meanwhile, flies two glass idea panels out of
 the depth and past the camera. Mouse and scroll stay independent.
+
+The scene, the runtime and its Draco decoder are all served from this folder
+(`assets/robot-big.splinecode`, `vendor/spline/`), so the chapter works offline and asks no
+CDN for anything. `vendor/spline/runtime.js` is the stock runtime with two small changes:
+the "Built with Spline" badge is removed and the renderer's pixel ratio is capped at 1.25
+so a 2× display does not render four times the pixels for no visible gain.
 
 ### 3.7 Code is my medium
 
@@ -151,7 +173,9 @@ exploring, and the closing lines.
 ### 3.8 Small robot
 
 A deliberately minimal chapter. The little robot **follows your mouse** too, with a gentler
-range, opposite a short block of copy.
+range, opposite a short block of copy. It uses the same self-hosted runtime and the smaller
+`assets/robot.splinecode`, whose compressed geometry is decoded by the copy of Draco in
+`vendor/spline/draco/`.
 
 ### 3.9 Footer
 

@@ -3,7 +3,7 @@
    01 Hydrate copy from content.js
    02 Start the cinematic sequence once assets are ready
    03 Settle → enable micro-interactions (cursor parallax)
-   04 Notification dismiss · theme button pulse
+   04 Notification dismiss
    ============================================================ */
 (() => {
   "use strict";
@@ -170,6 +170,8 @@
       docEl.classList.add("is-settled");
       enableInteractions();
     } else {
+      // flush styles so the classes above have created their animations
+      void docEl.offsetWidth;
       document.getAnimations().forEach((a) => {
         a.currentTime = freezeAt;
         a.pause();
@@ -203,16 +205,6 @@
         notification.hidden = true;
         notification.removeEventListener("animationend", onEnd);
       });
-    });
-  }
-
-  /* ---- 04b · Theme button — refined feedback pulse ---- */
-  const themeBtn = document.querySelector(".theme-btn");
-  if (themeBtn) {
-    themeBtn.addEventListener("click", () => {
-      themeBtn.classList.remove("is-pulse");
-      void themeBtn.offsetWidth; // restart the pulse animation
-      themeBtn.classList.add("is-pulse");
     });
   }
 
@@ -362,7 +354,7 @@
       }
     };
 
-    let pinTop = 0, range = 1, s2Range = 1, trRange = 1;
+    let pinTop = 0, range = 1, s2Range = 1, trRange = 1, entry = 0;
     let centers = [], centroid = { x: 0, y: 0 };
     let target = 0, cur = -1, rafS2 = null;
 
@@ -370,6 +362,10 @@
       pinTop = s2pin.offsetTop;
       range = Math.max(1, s2pin.offsetHeight - window.innerHeight);
       s2Range = window.innerHeight * (isMobileLayout() ? 1.8 : 2.4);
+      /* the reveal starts one screen early: the timeline is stretched over
+         the approach so the composition is already forming while the white
+         stage slides up, instead of showing an empty screen until the pin */
+      entry = window.innerHeight;
       /* fixed transition scrub; any extra pin height is a "dwell" where
          the About screen rests at pt = 1 before Works begins */
       trRange = window.innerHeight * (isMobileLayout() ? 2.8 : 3.4);
@@ -532,7 +528,7 @@
     let lastP2 = -1, lastPt = -1;
     const apply = (p) => {
       const scrolled = p * range;
-      const p2 = clamp01(scrolled / s2Range);
+      const p2 = clamp01((scrolled + entry) / (s2Range + entry));
       const pt = clamp01((scrolled - s2Range) / trRange);
       if (p2 !== lastP2) { lastP2 = p2; applyS2(p2); }
       if (pt !== lastPt) { lastPt = pt; applyTr(pt); }
@@ -545,8 +541,11 @@
       rafS2 = cur === target ? null : requestAnimationFrame(step);
     };
 
+    const s2Target = () =>
+      Math.min(1, Math.max(-entry / range, (window.scrollY - pinTop) / range));
+
     const onS2Scroll = () => {
-      target = clamp01((window.scrollY - pinTop) / range);
+      target = s2Target();
       docEl.classList.toggle("beyond-hero", window.scrollY > window.innerHeight * 0.85);
       if (rafS2 === null) rafS2 = requestAnimationFrame(step);
     };
@@ -554,7 +553,7 @@
     const refresh = () => {
       if (builtMobile !== null && builtMobile !== isMobileLayout()) buildFragments();
       measure();
-      target = clamp01((window.scrollY - pinTop) / range);
+      target = s2Target();
       cur = target;
       lastP2 = -1;
       lastPt = -1;
@@ -569,7 +568,7 @@
 
     const jumpTo = (y, overall) => {
       window.scrollTo({ top: Math.round(y), left: 0, behavior: "instant" });
-      target = cur = clamp01(overall);
+      target = cur = Math.min(1, Math.max(-entry / range, overall));
       lastP2 = -1;
       lastPt = -1;
       docEl.classList.toggle("beyond-hero", window.scrollY > window.innerHeight * 0.85);
@@ -578,7 +577,9 @@
 
     s2.jump = (p) => {
       measure();
-      jumpTo(pinTop + clamp01(p) * s2Range, (clamp01(p) * s2Range) / range);
+      const pp = clamp01(p);
+      const y = pinTop - entry + pp * (s2Range + entry);
+      jumpTo(y, (y - pinTop) / range);
     };
 
     s2.jumpTr = (p) => {
@@ -595,6 +596,31 @@
     const doorBtns = [...aboutRoot.querySelectorAll(".ab-box")];
     const views = [...aboutRoot.querySelectorAll(".ab-view")];
     let openBtn = null;
+
+    /* The doors carry ~240 KB of portraits. Fetch them one screen before
+       the chapter arrives, and the expanded portraits on first use, so
+       the opening view stays light without a visible empty state. */
+    const hydrate = (list) => list.forEach((img) => {
+      if (img.src) return;
+      img.src = img.dataset.src;
+      img.removeAttribute("data-src");
+    });
+    const doorImgs = [...aboutRoot.querySelectorAll(".ab-box img[data-src]")];
+    const viewImgs = [...aboutRoot.querySelectorAll(".ab-view img[data-src]")];
+    const hydrateDoors = () => hydrate(doorImgs);
+    const hydrateViews = () => hydrate(viewImgs);
+    const abBoxes = aboutRoot.querySelector(".ab-boxes");
+    if (abBoxes && "IntersectionObserver" in window) {
+      const nearAbout = new IntersectionObserver((entries) => {
+        if (!entries.some((en) => en.isIntersecting)) return;
+        hydrateDoors();
+        nearAbout.disconnect();
+      }, { rootMargin: "25% 0px" });
+      nearAbout.observe(abBoxes);
+    } else {
+      hydrateDoors();
+      hydrateViews();
+    }
 
     const openAbout = (btn) => {
       if (!detail || openBtn) return;
@@ -638,6 +664,8 @@
           if (worksApi) worksApi.enter();
           return;
         }
+        hydrateDoors();
+        hydrateViews();
         openAbout(btn);
       })
     );
@@ -721,15 +749,26 @@
         `<p class="wk-num">${pad2(i + 1)} / ${pad2(projects.length)}</p>` +
         `<h3 class="wk-name">${p.name || p.key}</h3>` +
         `<p class="wk-titleline">${p.title || ""}</p>` +
-        `<p class="wk-meta"><i></i>${p.cat || ""} &middot; ${p.year || ""}</p>` +
-        `<button class="wk-view" type="button">View Project ${ARROW}</button>` +
+        `<p class="wk-meta${p.live ? " is-live" : ""}"><i></i>` +
+        (p.live ? '<b class="wk-live">Live result</b> &middot; ' : "") +
+        `${p.cat || ""} &middot; ${p.year || ""}</p>` +
+        (p.link
+          ? `<a class="wk-view" href="${p.link}" target="_blank" rel="noopener">View Project ${ARROW}</a>`
+          : `<button class="wk-view" type="button">View Project ${ARROW}</button>`) +
         "</div>" +
-        `<figure class="wk-media"><img src="${p.img}" alt="${p.name || ""}" ` +
-        `width="${p.w}" height="${p.h}" loading="lazy" decoding="async"></figure>`;
+        `<figure class="wk-media" style="aspect-ratio:${p.w} / ${p.h}"><img data-src="${p.img}" alt="${p.name || ""}" ` +
+        `width="${p.w}" height="${p.h}" loading="lazy" decoding="async">` +
+        `<button class="wk-zoom" type="button" aria-label="Enlarge ${p.name || p.key} screenshot">` +
+        '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+        '<path d="M5 1H1v4M9 13h4V9M13 1H9v4M1 13h4V9"/></svg></button></figure>';
       scr.append(ghost, glass);
       addScreen(scr, i % 2 === 0 ? -1 : 1);
       const viewBtn = glass.querySelector(".wk-view");
-      if (viewBtn) viewBtn.addEventListener("click", () => openDetail(p));
+      if (viewBtn && viewBtn.tagName === "BUTTON") {
+        viewBtn.addEventListener("click", () => openDetail(p));
+      }
+      const zoomBtn = glass.querySelector(".wk-zoom");
+      if (zoomBtn) zoomBtn.addEventListener("click", () => openDetail(p));
     });
 
     {
@@ -744,7 +783,8 @@
     }
 
     const N = screens.length;
-    if (totalEl) totalEl.textContent = pad2(N);
+    // the bottom counter counts projects, not the intro/outro stages
+    if (totalEl) totalEl.textContent = pad2(projects.length);
     track.style.height = `${100 + (N - 1) * 120}vh`;
 
     /* — the camera — */
@@ -754,12 +794,28 @@
 
     const isMobileWk = () => window.innerWidth <= 720;
 
+    /* screens enter the dolly three at a time; their screenshots only
+       download then, so opening the overlay starts almost instantly */
+    const hydrate = (i) => {
+      const scr = screens[i];
+      if (!scr) return;
+      const img = scr.el.querySelector("img[data-src]");
+      if (!img) return;
+      img.src = img.dataset.src;
+      img.removeAttribute("data-src");
+    };
+    const hydrateAround = (a) => {
+      const mid = Math.round(a);
+      for (let j = mid - 1; j <= mid + 1; j++) hydrate(j);
+    };
+
     const measureWk = () => {
       wkRange = Math.max(1, track.offsetHeight - scroller.clientHeight);
     };
 
     const applyWk = (p) => {
       const a = p * (N - 1);
+      hydrateAround(a);
       const depth = isMobileWk() ? 520 : 820;
       const lat = isMobileWk() ? 2.4 : 5.4;
       const mobile = isMobileWk();
@@ -779,10 +835,13 @@
         s.el.style.transform =
           `translate3d(${x.toFixed(2)}vw, ${y.toFixed(2)}svh, ${z.toFixed(1)}px) ` +
           `rotateY(${rotY.toFixed(2)}deg) rotateX(${rotX.toFixed(2)}deg)`;
-        s.el.style.opacity = (off >= 0
+        let op = off >= 0
           ? Math.max(0, 1 - off * 0.82)
-          : Math.max(0, 1 + off * 1.6)
-        ).toFixed(3);
+          : Math.max(0, 1 + off * 1.6);
+        // the title card gets a clean background; the first project
+        // fades in only once the journey has actually begun
+        if (i > 0) op *= Math.min(1, a * 2.5);
+        s.el.style.opacity = op.toFixed(3);
         s.el.style.zIndex = String(100 - Math.round(off * 10));
         s.el.style.setProperty("--o", off.toFixed(3));
         if (!mobile) {
@@ -792,7 +851,7 @@
         }
       });
 
-      const shown = pad2(Math.min(N, Math.max(1, Math.round(a) + 1)));
+      const shown = pad2(Math.min(projects.length, Math.max(1, Math.round(a))));
       if (idxEl && shown !== lastIdxShown) { lastIdxShown = shown; idxEl.textContent = shown; }
     };
 
@@ -846,6 +905,8 @@
         scroller.scrollTop = 0;
         wp = wpTarget = 0;
         lastIdxShown = "";
+        if (reduceMotion.matches) screens.forEach((_, i) => hydrate(i));
+        else hydrateAround(0);
         if (!reduceMotion.matches) { measureWk(); applyWk(0); }
         requestAnimationFrame(() => wk.classList.add("is-in"));
       }, () => { if (backBtn) backBtn.focus({ preventScroll: true }); });
@@ -869,14 +930,13 @@
 
     worksApi = { enter, exit };
 
-    // the header nav "Projects" link opens the chapter from anywhere
-    const projectsNav = document.querySelector('.nav-link[href="#projects"]');
-    if (projectsNav) {
-      projectsNav.addEventListener("click", (e) => {
-        e.preventDefault();
-        enter();
-      });
-    }
+    // every "Projects" link (header nav + footer) opens the chapter
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest('a[href="#projects"]');
+      if (!link) return;
+      e.preventDefault();
+      enter();
+    });
 
     if (backBtn) backBtn.addEventListener("click", exit);
     if (detailClose) detailClose.addEventListener("click", () => closeDetail(false));
@@ -890,6 +950,157 @@
   }
 
 
+  /* ---- 07b · EXPERIENCE — pinned company deck ----
+     A scrollytelling chapter: one card per role, advanced by scroll.
+     The section is pinned on desktop; on small screens (or reduced
+     motion) the cards stack and read as a normal timeline. */
+  const xpSection = document.querySelector(".xp");
+
+  if (xpSection && typeof heroContent === "object" && heroContent.experience) {
+    const copy = heroContent.experience;
+    const deck = xpSection.querySelector('[data-slot="xp-deck"]');
+    const rail = xpSection.querySelector('[data-slot="xp-rail"]');
+    const idxEl = xpSection.querySelector("[data-xp-idx]");
+    const totalEl = xpSection.querySelector("[data-xp-total]");
+    const companies = copy.companies || [];
+    const pad2 = (n) => String(n).padStart(2, "0");
+    const clamp01 = (v) => Math.min(1, Math.max(0, v));
+    const ARROWS =
+      '<svg viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.6" ' +
+      'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M1 6h15M11 1l5 5-5 5"/></svg>';
+
+    setSlot("xp-eyebrow", copy.eyebrow);
+    setSlot("xp-title-1", copy.title && copy.title[0]);
+    setSlot("xp-title-2", copy.title && copy.title[1]);
+    setSlot("xp-note", copy.note);
+    if (totalEl) totalEl.textContent = pad2(companies.length);
+
+    const initials = (name) =>
+      name.split(/\s+/).filter(Boolean).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
+
+    const cards = companies.map((c) => {
+      const el = document.createElement("article");
+      el.className = "xp-card";
+      const logo = c.logo
+        ? `<img src="${c.logo}" alt="${c.name} logo" loading="lazy" decoding="async">`
+        : `<span class="xp-mono">${initials(c.name)}</span>`;
+      const logoCell = c.logoDark ? "xp-logo xp-logo--dark" : "xp-logo";
+      el.innerHTML =
+        '<div class="xp-top">' +
+          `<span class="${logoCell}">${logo}</span>` +
+          '<div class="xp-id">' +
+            `<p class="xp-period">${c.period || ""}${c.place ? " &middot; " + c.place : ""}</p>` +
+            `<h3 class="xp-company">${c.name}</h3>` +
+            `<p class="xp-role">${c.role || ""}</p>` +
+          "</div>" +
+        "</div>" +
+        `<p class="xp-summary">${c.summary || ""}</p>` +
+        `<ul class="xp-tags">${(c.tags || []).map((t) => `<li>${t}</li>`).join("")}</ul>` +
+        '<div class="xp-bottom">' +
+          `<span class="xp-metric">${c.metric || ""}</span>` +
+          (c.link
+            ? `<a class="xp-link" href="${c.link}" target="_blank" rel="noopener">Visit ${ARROWS}</a>`
+            : "") +
+        "</div>";
+      if (deck) deck.append(el);
+      return el;
+    });
+
+    const dots = companies.map((c, i) => {
+      const dot = document.createElement("span");
+      dot.className = "xp-dot";
+      dot.innerHTML = `<i>${pad2(i + 1)}</i><b>${c.name}</b>`;
+      if (rail) rail.append(dot);
+      return dot;
+    });
+
+    const isStacked = () =>
+      window.innerWidth <= 900 || reduceMotion.matches;
+
+    let xpPinTop = 0, xpRange = 1;
+    let xpP = 0, xpTarget = 0, xpRaf = null, xpLastT = 0, xpActive = -1;
+
+    const measureXp = () => {
+      const r = xpSection.getBoundingClientRect();
+      xpPinTop = r.top + window.scrollY;
+      xpRange = Math.max(1, xpSection.offsetHeight - window.innerHeight);
+    };
+
+    const paintXp = () => {
+      const n = companies.length;
+      const a = clamp01(xpP) * (n - 1);
+      const active = Math.min(n - 1, Math.max(0, Math.round(a)));
+      cards.forEach((card, i) => {
+        const rel = i - active;
+        const dist = Math.abs(rel);
+        // one card holds the stage; the next one peeks underneath
+        const opacity = rel === 0 ? 1 : rel === 1 ? 0.08 : 0;
+        const y = rel * 118;
+        const scale = rel === 0 ? 1 : 0.94;
+        card.style.transform =
+          `translate(-50%, calc(-50% + ${y}px)) scale(${scale.toFixed(3)})`;
+        card.style.opacity = opacity.toFixed(3);
+        // only the active card and the one peeking underneath need paint
+        card.style.visibility = rel > 1 ? "hidden" : "";
+        card.style.zIndex = String(100 - dist * 10);
+        card.classList.toggle("is-active", rel === 0);
+      });
+
+      if (active !== xpActive) {
+        xpActive = active;
+        if (idxEl) idxEl.textContent = pad2(active + 1);
+        dots.forEach((d, i) => d.classList.toggle("is-on", i === active));
+      }
+    };
+
+    const stepXp = (now) => {
+      const dt = xpLastT ? Math.min((now - xpLastT) / 1000, 0.25) : 0.016;
+      xpLastT = now;
+      xpP += (xpTarget - xpP) * (1 - Math.exp(-dt / 0.12));
+      if (Math.abs(xpTarget - xpP) < 0.0005) xpP = xpTarget;
+      paintXp();
+      if (xpP === xpTarget) { xpLastT = 0; xpRaf = null; return; }
+      xpRaf = requestAnimationFrame(stepXp);
+    };
+
+    const kickXp = () => { if (xpRaf === null) xpRaf = requestAnimationFrame(stepXp); };
+
+    const onXpScroll = () => {
+      if (isStacked()) return;
+      xpTarget = clamp01((window.scrollY - xpPinTop) / xpRange);
+      kickXp();
+    };
+
+    const syncXp = () => {
+      const stacked = isStacked();
+      xpSection.classList.toggle("is-stacked", stacked);
+      if (stacked) {
+        cards.forEach((c) => {
+          c.style.transform = "";
+          c.style.opacity = "";
+          c.style.visibility = "";
+          c.style.zIndex = "";
+          c.classList.add("is-active");
+        });
+        dots.forEach((d) => d.classList.add("is-on"));
+        if (idxEl) idxEl.textContent = pad2(companies.length);
+      } else {
+        measureXp();
+        xpActive = -1;
+        xpTarget = xpP = clamp01((window.scrollY - xpPinTop) / xpRange);
+        paintXp();
+      }
+    };
+
+    window.addEventListener("scroll", onXpScroll, { passive: true });
+    window.addEventListener("resize", syncXp);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncXp);
+    reduceMotion.addEventListener?.("change", syncXp);
+    syncXp();
+  }
+
+
   /* ---- 08 · BIG ROBOT — the original large Nexbot experience ----
      The supplied scene keeps its own lighting, composition and scale.
      Its head answers to the MOUSE (the scene's own cursor-follow is a
@@ -898,8 +1109,8 @@
      the camera for the glass idea panels only: the two systems are
      completely independent of each other. */
   const RB = {
-    scene: "https://prod.spline.design/9U1pA50upCe33lsu/scene.splinecode",
-    runtime: "https://cdn.spline.design/@splinetool/runtime@2.0.13/build/runtime.js",
+    scene: "assets/robot-big.splinecode",
+    runtime: "./vendor/spline/runtime.js",
     zFar: -1500,         // where a panel starts, deep in the scene
     zPast: 760,          // where it ends, past the viewer
     lateral: 23,         // how far off-centre (vw) — panels pass beside the robot
@@ -1104,13 +1315,19 @@
       loading = true;
       import(RB.runtime)
         .then(({ Application }) => {
-          app = new Application(canvas);
+          app = new Application(canvas, { renderer: "webgl" });
           return app.load(RB.scene);
         })
         .then(() => {
           // take the rig over so the look reads clearly, keeping the rest
           // (lighting, materials, composition, scale) exactly as supplied
           if (app.setGlobalEvents) app.setGlobalEvents(false);
+          // the watermark is already gone from the vendored runtime; this
+          // also covers any scene that carries its own logo overlay
+          const renderer = app._renderer;
+          if (renderer && renderer.pipeline && renderer.pipeline.setWatermark) {
+            renderer.pipeline.setWatermark(null);
+          }
           const find = (n) => (app.findObjectByName ? app.findObjectByName(n) : null);
           rig = { head: find("Head"), head2: find("Head 2"), neck: find("Neck") };
           running = true;
@@ -1145,6 +1362,18 @@
     }, { threshold: [0, 0.12] });
     vis.observe(rbSection);
 
+    // no frames are wasted while the tab is in the background
+    document.addEventListener("visibilitychange", () => {
+      if (!app) return;
+      if (document.hidden) {
+        app.stop();
+        running = false;
+      } else if (active) {
+        app.play();
+        running = true;
+      }
+    });
+
     measureRb();
     onScroll();
 
@@ -1161,7 +1390,7 @@
      and held inside a natural range. Scroll plays no part here. */
   const SR = {
     scene: "assets/robot.splinecode",   // extracted from the supplied Spline source
-    runtime: "https://cdn.spline.design/@splinetool/runtime@2.0.13/build/runtime.js",
+    runtime: "./vendor/spline/runtime.js",
     turn: 0.44,        // head yaw at the edge of the screen (rad, about 25deg)
     tilt: 0.07,        // micro roll that rides along with the turn
     tau: 0.32,         // damping: it follows the cursor with a little weight
@@ -1219,13 +1448,17 @@
       loading = true;
       import(SR.runtime)
         .then(({ Application }) => {
-          app = new Application(canvas);
+          app = new Application(canvas, { renderer: "webgl" });
           return app.load(SR.scene);
         })
         .then(() => {
           // the supplied scene follows the cursor through a `lookAt` event:
           // switch its document listeners off so the head is ours alone.
           if (app.setGlobalEvents) app.setGlobalEvents(false);
+          const renderer = app._renderer;
+          if (renderer && renderer.pipeline && renderer.pipeline.setWatermark) {
+            renderer.pipeline.setWatermark(null);
+          }
           head = app.findObjectByName ? app.findObjectByName("Cabeza") : null;
           if (head) head.rotation.y = 0;   // it starts facing straight at us
           running = true;
@@ -1259,6 +1492,17 @@
       });
     }, { threshold: [0, 0.15] });
     visSr.observe(srSection);
+
+    document.addEventListener("visibilitychange", () => {
+      if (!app) return;
+      if (document.hidden) {
+        app.stop();
+        running = false;
+      } else if (active) {
+        app.play();
+        running = true;
+      }
+    });
 
     if (reduceMotion.matches) style.setProperty("--srIn", "1");
   }
@@ -1532,6 +1776,43 @@
         window.scrollTo({ top: 0, behavior: reduceMotion.matches ? "auto" : "smooth" });
       });
     }
+  }
+
+  /* ---- 09 · MOBILE NAVIGATION ----
+     The primary links are hidden by the compact header; this
+     toggle opens them as a glass dropdown without a second menu. */
+  const siteHeader = document.querySelector(".site-header");
+  const navToggle = document.querySelector(".nav-toggle");
+  const primaryNav = document.querySelector(".site-nav");
+
+  if (siteHeader && navToggle && primaryNav) {
+    const setNavOpen = (open) => {
+      siteHeader.classList.toggle("is-nav-open", open);
+      navToggle.setAttribute("aria-expanded", String(open));
+      navToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    };
+
+    navToggle.addEventListener("click", () => {
+      setNavOpen(!siteHeader.classList.contains("is-nav-open"));
+    });
+
+    primaryNav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => setNavOpen(false));
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setNavOpen(false);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (siteHeader.classList.contains("is-nav-open") && !siteHeader.contains(e.target)) {
+        setNavOpen(false);
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 900) setNavOpen(false);
+    });
   }
 
   if (s2pParam !== null && s2.jump) {
